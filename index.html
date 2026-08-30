@@ -107,14 +107,32 @@
     z-index: 10;
     background: hsl(240, 100%, 15%);
   }
-  #menu h1 {
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
     font-weight: bold;
-    letter-spacing: 3px;
-    font-size: 15vw;
-    max-font-size: 64px;
-    margin: 0;
-    text-align: center;
+    font-size: 26px;
+    letter-spacing: 0px;
+    border: 2px solid hsla(240, 100%, 85%, 0.5);
+    border-radius: 10px;
+    padding: 6px 10px;
     line-height: 1;
+  }
+  .logo-r { color: hsl(60, 100%, 50%); }
+  .logo-p1 { color: hsl(300, 100%, 50%); }
+  .logo-p2 { color: hsl(180, 100%, 50%); }
+  .brand-title {
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 22px;
+    line-height: 1.2;
   }
   #menu .subtitle {
     font-size: 16px;
@@ -174,7 +192,12 @@
 
   <div id="center">
     <div id="menu">
-      <h1 style="font-size: 12vw;">REFLEX<br>PING PONG</h1>
+      <div class="brand-row">
+        <div class="logo-mark">
+          <span class="logo-r">R</span><span class="logo-p1">P</span><span class="logo-p2">P</span>
+        </div>
+        <div class="brand-title">REFLEX PING PONG</div>
+      </div>
       <div class="subtitle">elige tu raqueta</div>
       <div class="choice-row">
         <button class="choice-btn" id="btn-cyan">CIAN</button>
