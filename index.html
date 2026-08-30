@@ -1,10 +1,373 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Web 2</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pong 1972</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: hsl(240, 100%, 15%);
+    overflow: hidden;
+    touch-action: none;
+  }
+  #menu {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    font-family: monospace;
+    color: hsl(240, 100%, 85%);
+    z-index: 10;
+  }
+  #menu h1 {
+    font-weight: normal;
+    letter-spacing: 4px;
+    font-size: 20px;
+  }
+  .choice-row {
+    display: flex;
+    gap: 20px;
+  }
+  .choice-btn {
+    padding: 14px 28px;
+    font-family: monospace;
+    font-size: 16px;
+    letter-spacing: 2px;
+    background: transparent;
+    border: 2px solid;
+    cursor: pointer;
+  }
+  #btn-cyan {
+    color: hsl(180, 100%, 50%);
+    border-color: hsl(180, 100%, 50%);
+  }
+  #btn-magenta {
+    color: hsl(300, 100%, 50%);
+    border-color: hsl(300, 100%, 50%);
+  }
+  #canvas-wrap {
+    position: fixed;
+    inset: 0;
+    display: none;
+  }
+  canvas {
+    display: block;
+  }
+</style>
 </head>
 <body>
-    <h1>Esta es mi web numero 2</h1>
+
+<div id="menu">
+  <h1>REFLEX PONG</h1>
+  <div>elige tu raqueta</div>
+  <div class="choice-row">
+    <button class="choice-btn" id="btn-cyan">CIAN</button>
+    <button class="choice-btn" id="btn-magenta">MAGENTA</button>
+  </div>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="game"></canvas>
+</div>
+
+<script>
+(function() {
+  const COLOR_BG = 'hsl(240, 100%, 15%)';
+  const COLOR_LINE = 'hsl(240, 100%, 85%)';
+  const COLOR_BALL = 'hsl(60, 100%, 50%)';
+  const COLOR_CYAN = 'hsl(180, 100%, 50%)';
+  const COLOR_MAGENTA = 'hsl(300, 100%, 50%)';
+
+  const menu = document.getElementById('menu');
+  const wrap = document.getElementById('canvas-wrap');
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  let playerColor = null; // 'cyan' | 'magenta'
+  let W, H;
+  const PADDLE_W_RATIO = 0.22; // fraction of screen width
+  const PADDLE_H = 8;
+  const PADDLE_MARGIN = 24;
+  const BALL_RADIUS = 8;
+  const COURT_MARGIN = 16;
+
+  let paddleTop, paddleBottom, ball, keys = {};
+  let nextServer = null; // 'cyan' | 'magenta' - who serves next (loser of last point)
+  let trail = [];
+  const TRAIL_LENGTH = 10;
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+  }
+  window.addEventListener('resize', resize);
+
+  function resetBall() {
+    const speed = Math.max(4, W * 0.006);
+    const angle = (Math.random() * 0.6 - 0.3); // slight random horizontal component
+    // ball heads toward the server's opponent, starting from server's side
+    let direction;
+    if (nextServer === 'cyan') direction = 1; // cyan (top) serves, ball heads down toward magenta
+    else if (nextServer === 'magenta') direction = -1; // magenta (bottom) serves, ball heads up toward cyan
+    else direction = (Math.random() < 0.5 ? 1 : -1);
+
+    ball = {
+      x: W / 2,
+      y: H / 2,
+      vx: speed * angle * 3,
+      vy: speed * direction,
+      radius: BALL_RADIUS
+    };
+    trail = [];
+  }
+
+  function initGame() {
+    resize();
+    const paddleW = W * PADDLE_W_RATIO;
+    paddleTop = { x: W / 2 - paddleW / 2, w: paddleW, h: PADDLE_H, y: COURT_MARGIN + PADDLE_MARGIN, speed: W * 0.012 };
+    paddleBottom = { x: W / 2 - paddleW / 2, w: paddleW, h: PADDLE_H, y: H - COURT_MARGIN - PADDLE_MARGIN - PADDLE_H, speed: W * 0.012 };
+    nextServer = null;
+    resetBall();
+  }
+
+  // Controls: player controls one paddle via pointer / arrow keys, the other side is AI
+  let pointerX = null;
+
+  canvas.addEventListener('mousemove', (e) => {
+    pointerX = e.clientX;
+  });
+  canvas.addEventListener('touchmove', (e) => {
+    pointerX = e.touches[0].clientX;
+    e.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+  window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  // ---- Audio: synthesized "pong" hit sound ----
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playHit(intensity) {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const baseFreq = 520 + clamp(intensity, 0, 1) * 260;
+
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.09);
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.5, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+
+    const click = audioCtx.createOscillator();
+    click.type = 'square';
+    click.frequency.setValueAtTime(baseFreq * 2.4, now);
+    const clickGain = audioCtx.createGain();
+    clickGain.gain.setValueAtTime(0.15, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+
+    osc.connect(gain).connect(audioCtx.destination);
+    click.connect(clickGain).connect(audioCtx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.12);
+    click.start(now);
+    click.stop(now + 0.03);
+  }
+
+  function playWallTick() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(660, now + 0.05);
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.25, now + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.07);
+  }
+
+  function update() {
+    const playerPaddle = playerColor === 'cyan' ? paddleTop : paddleBottom;
+    const aiPaddle = playerColor === 'cyan' ? paddleBottom : paddleTop;
+
+    const minX = COURT_MARGIN;
+    const maxX = W - COURT_MARGIN;
+
+    // player control
+    if (pointerX !== null) {
+      playerPaddle.x = clamp(pointerX - playerPaddle.w / 2, minX, maxX - playerPaddle.w);
+    }
+    if (keys['ArrowLeft']) playerPaddle.x = clamp(playerPaddle.x - playerPaddle.speed, minX, maxX - playerPaddle.w);
+    if (keys['ArrowRight']) playerPaddle.x = clamp(playerPaddle.x + playerPaddle.speed, minX, maxX - playerPaddle.w);
+
+    // simple AI tracking with slight lag
+    const targetX = ball.x - aiPaddle.w / 2;
+    const aiSpeed = aiPaddle.speed * 0.85;
+    if (Math.abs(aiPaddle.x - targetX) > aiSpeed) {
+      aiPaddle.x += aiPaddle.x < targetX ? aiSpeed : -aiSpeed;
+    }
+    aiPaddle.x = clamp(aiPaddle.x, minX, maxX - aiPaddle.w);
+
+    // ball movement
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    // record trail position
+    trail.push({ x: ball.x, y: ball.y });
+    if (trail.length > TRAIL_LENGTH) trail.shift();
+
+    // wall bounce (left/right) - bounded by court margin
+    if (ball.x - ball.radius <= COURT_MARGIN) {
+      ball.x = COURT_MARGIN + ball.radius;
+      ball.vx *= -1;
+      playWallTick();
+    } else if (ball.x + ball.radius >= W - COURT_MARGIN) {
+      ball.x = W - COURT_MARGIN - ball.radius;
+      ball.vx *= -1;
+      playWallTick();
+    }
+
+    // paddle collision - top
+    if (ball.vy < 0 &&
+        ball.y - ball.radius <= paddleTop.y + paddleTop.h &&
+        ball.y - ball.radius >= paddleTop.y &&
+        ball.x >= paddleTop.x && ball.x <= paddleTop.x + paddleTop.w) {
+      ball.y = paddleTop.y + paddleTop.h + ball.radius;
+      ball.vy *= -1.03;
+      const hitPos = (ball.x - (paddleTop.x + paddleTop.w / 2)) / (paddleTop.w / 2);
+      ball.vx += hitPos * 2.5;
+      const speed = Math.hypot(ball.vx, ball.vy);
+      playHit(clamp(speed / 20, 0, 1));
+    }
+
+    // paddle collision - bottom
+    if (ball.vy > 0 &&
+        ball.y + ball.radius >= paddleBottom.y &&
+        ball.y + ball.radius <= paddleBottom.y + paddleBottom.h &&
+        ball.x >= paddleBottom.x && ball.x <= paddleBottom.x + paddleBottom.w) {
+      ball.y = paddleBottom.y - ball.radius;
+      ball.vy *= -1.03;
+      const hitPos = (ball.x - (paddleBottom.x + paddleBottom.w / 2)) / (paddleBottom.w / 2);
+      ball.vx += hitPos * 2.5;
+      const speed = Math.hypot(ball.vx, ball.vy);
+      playHit(clamp(speed / 20, 0, 1));
+    }
+
+    // point lost: ball passes top -> cyan lost, serves next. ball passes bottom -> magenta lost, serves next.
+    if (ball.y < -50) {
+      nextServer = 'cyan';
+      resetBall();
+    } else if (ball.y > H + 50) {
+      nextServer = 'magenta';
+      resetBall();
+    }
+  }
+
+  function roundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  function draw() {
+    ctx.fillStyle = COLOR_BG;
+    ctx.fillRect(0, 0, W, H);
+
+    // court outline (like a ping pong table border)
+    ctx.strokeStyle = COLOR_LINE;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(
+      COURT_MARGIN, COURT_MARGIN,
+      W - COURT_MARGIN * 2, H - COURT_MARGIN * 2
+    );
+
+    // continuous center line (net)
+    ctx.beginPath();
+    ctx.moveTo(COURT_MARGIN, H / 2);
+    ctx.lineTo(W - COURT_MARGIN, H / 2);
+    ctx.stroke();
+
+    // paddles - elongated rounded shape (squirtle-like capsule)
+    const topRadius = paddleTop.h / 2;
+    ctx.fillStyle = COLOR_CYAN;
+    roundedRect(paddleTop.x, paddleTop.y, paddleTop.w, paddleTop.h, topRadius);
+    ctx.fill();
+
+    const bottomRadius = paddleBottom.h / 2;
+    ctx.fillStyle = COLOR_MAGENTA;
+    roundedRect(paddleBottom.x, paddleBottom.y, paddleBottom.w, paddleBottom.h, bottomRadius);
+    ctx.fill();
+
+    // ball trail (speed effect)
+    for (let i = 0; i < trail.length; i++) {
+      const t = trail[i];
+      const progress = i / trail.length; // 0 = oldest, 1 = newest
+      const alpha = progress * 0.35;
+      const r = ball.radius * (0.4 + progress * 0.6);
+      ctx.beginPath();
+      ctx.fillStyle = `hsla(60, 100%, 50%, ${alpha})`;
+      ctx.arc(t.x, t.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ball - circle
+    ctx.fillStyle = COLOR_BALL;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function startGame(color) {
+    ensureAudio();
+    playerColor = color;
+    menu.style.display = 'none';
+    wrap.style.display = 'block';
+    initGame();
+    requestAnimationFrame(loop);
+  }
+
+  document.getElementById('btn-cyan').addEventListener('click', () => startGame('cyan'));
+  document.getElementById('btn-magenta').addEventListener('click', () => startGame('magenta'));
+})();
+</script>
+
 </body>
 </html>
