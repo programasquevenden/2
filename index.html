@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pong 1972</title>
+<title>REFLEX PING PONG</title>
 <style>
   html, body {
     margin: 0;
@@ -12,7 +12,89 @@
     background: hsl(240, 100%, 15%);
     overflow: hidden;
     touch-action: none;
+    font-family: monospace;
   }
+  #app {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: row;
+  }
+  .side-panel {
+    width: 72px;
+    flex: 0 0 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .side-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: hsla(240, 100%, 85%, 0.25);
+  }
+  #panel-left::before { right: 0; }
+  #panel-right::before { left: 0; }
+
+  .score {
+    font-size: 34px;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 0 0 10px currentColor;
+  }
+  .score-cyan { color: hsl(180, 100%, 50%); }
+  .score-magenta { color: hsl(300, 100%, 50%); }
+
+  .speed-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: hsla(240, 100%, 85%, 0.6);
+    margin-bottom: 6px;
+    writing-mode: vertical-rl;
+  }
+  .speed-meter {
+    width: 8px;
+    height: 140px;
+    border: 1px solid hsla(240, 100%, 85%, 0.4);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    background: hsla(240, 100%, 85%, 0.05);
+  }
+  .speed-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: hsl(60, 100%, 50%);
+    transition: height 0.08s linear;
+  }
+
+  .deco-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .deco-dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: hsla(240, 100%, 85%, 0.3);
+    display: block;
+  }
+
+  #center {
+    flex: 1;
+    position: relative;
+  }
+
   #menu {
     position: fixed;
     inset: 0;
@@ -20,15 +102,23 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 24px;
-    font-family: monospace;
+    gap: 28px;
     color: hsl(240, 100%, 85%);
     z-index: 10;
+    background: hsl(240, 100%, 15%);
   }
   #menu h1 {
-    font-weight: normal;
-    letter-spacing: 4px;
-    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    font-size: 15vw;
+    max-font-size: 64px;
+    margin: 0;
+    text-align: center;
+    line-height: 1;
+  }
+  #menu .subtitle {
+    font-size: 16px;
+    letter-spacing: 2px;
   }
   .choice-row {
     display: flex;
@@ -52,28 +142,61 @@
     border-color: hsl(300, 100%, 50%);
   }
   #canvas-wrap {
-    position: fixed;
+    position: absolute;
     inset: 0;
     display: none;
   }
   canvas {
     display: block;
   }
+  #serve-hint {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: hsla(240, 100%, 85%, 0.6);
+    font-size: 12px;
+    letter-spacing: 1px;
+    pointer-events: none;
+    display: none;
+  }
 </style>
 </head>
 <body>
 
-<div id="menu">
-  <h1>REFLEX PONG</h1>
-  <div>elige tu raqueta</div>
-  <div class="choice-row">
-    <button class="choice-btn" id="btn-cyan">CIAN</button>
-    <button class="choice-btn" id="btn-magenta">MAGENTA</button>
+<div id="app">
+  <div class="side-panel" id="panel-left">
+    <div class="score score-cyan" id="score-cyan">0</div>
+    <div class="deco-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="score score-magenta" id="score-magenta">0</div>
   </div>
-</div>
 
-<div id="canvas-wrap">
-  <canvas id="game"></canvas>
+  <div id="center">
+    <div id="menu">
+      <h1 style="font-size: 12vw;">REFLEX<br>PING PONG</h1>
+      <div class="subtitle">elige tu raqueta</div>
+      <div class="choice-row">
+        <button class="choice-btn" id="btn-cyan">CIAN</button>
+        <button class="choice-btn" id="btn-magenta">MAGENTA</button>
+      </div>
+    </div>
+
+    <div id="canvas-wrap">
+      <canvas id="game"></canvas>
+      <div id="serve-hint">toca o presiona espacio para sacar</div>
+    </div>
+  </div>
+
+  <div class="side-panel" id="panel-right">
+    <div class="speed-label">VELOCIDAD</div>
+    <div class="speed-meter">
+      <div class="speed-fill" id="speed-fill"></div>
+    </div>
+    <div class="deco-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -88,68 +211,127 @@
   const wrap = document.getElementById('canvas-wrap');
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
+  const scoreCyanEl = document.getElementById('score-cyan');
+  const scoreMagentaEl = document.getElementById('score-magenta');
+  const speedFillEl = document.getElementById('speed-fill');
+  const serveHintEl = document.getElementById('serve-hint');
 
   let playerColor = null; // 'cyan' | 'magenta'
   let W, H;
-  const PADDLE_W_RATIO = 0.22; // fraction of screen width
+  const PADDLE_W_RATIO = 0.28; // fraction of screen width
   const PADDLE_H = 8;
   const PADDLE_MARGIN = 24;
   const BALL_RADIUS = 8;
   const COURT_MARGIN = 16;
+  const MAX_SPEED = 22;
 
   let paddleTop, paddleBottom, ball, keys = {};
-  let nextServer = null; // 'cyan' | 'magenta' - who serves next (loser of last point)
+  let servingSide = null; // 'cyan' | 'magenta' - who is about to serve
+  let gameState = 'idle'; // 'serving' | 'playing'
+  let scores = { cyan: 0, magenta: 0 };
   let trail = [];
   const TRAIL_LENGTH = 10;
+  let aiServeTimer = null;
 
   function resize() {
-    W = window.innerWidth;
-    H = window.innerHeight;
+    W = canvas.parentElement.clientWidth;
+    H = canvas.parentElement.clientHeight;
     canvas.width = W;
     canvas.height = H;
   }
   window.addEventListener('resize', resize);
 
-  function resetBall() {
-    const speed = Math.max(4, W * 0.006);
-    const angle = (Math.random() * 0.6 - 0.3); // slight random horizontal component
-    // ball heads toward the server's opponent, starting from server's side
-    let direction;
-    if (nextServer === 'cyan') direction = 1; // cyan (top) serves, ball heads down toward magenta
-    else if (nextServer === 'magenta') direction = -1; // magenta (bottom) serves, ball heads up toward cyan
-    else direction = (Math.random() < 0.5 ? 1 : -1);
+  function updateScoreDisplay() {
+    scoreCyanEl.textContent = scores.cyan;
+    scoreMagentaEl.textContent = scores.magenta;
+  }
 
-    ball = {
-      x: W / 2,
-      y: H / 2,
-      vx: speed * angle * 3,
-      vy: speed * direction,
-      radius: BALL_RADIUS
-    };
+  function attachBallToServer() {
+    const paddle = servingSide === 'cyan' ? paddleTop : paddleBottom;
+    ball.x = paddle.x + paddle.w / 2;
+    if (servingSide === 'cyan') {
+      ball.y = paddle.y + paddle.h + ball.radius;
+    } else {
+      ball.y = paddle.y - ball.radius;
+    }
+    ball.vx = 0;
+    ball.vy = 0;
+  }
+
+  function startServe(side) {
+    servingSide = side;
+    gameState = 'serving';
     trail = [];
+    attachBallToServer();
+
+    const isPlayerServing = side === playerColor;
+    serveHintEl.style.display = isPlayerServing ? 'block' : 'none';
+    positionServeHint();
+
+    if (!isPlayerServing) {
+      clearTimeout(aiServeTimer);
+      aiServeTimer = setTimeout(() => {
+        if (gameState === 'serving' && servingSide === side) fireServe();
+      }, 700 + Math.random() * 500);
+    }
+  }
+
+  function positionServeHint() {
+    const paddle = servingSide === 'cyan' ? paddleTop : paddleBottom;
+    if (servingSide === 'cyan') {
+      serveHintEl.style.top = (paddle.y + paddle.h + 20) + 'px';
+    } else {
+      serveHintEl.style.top = (paddle.y - 34) + 'px';
+    }
+  }
+
+  function fireServe() {
+    if (gameState !== 'serving') return;
+    clearTimeout(aiServeTimer);
+    gameState = 'playing';
+    serveHintEl.style.display = 'none';
+
+    const speed = Math.max(5, W * 0.008);
+    const angle = (Math.random() * 0.5 - 0.25);
+    const direction = servingSide === 'cyan' ? 1 : -1;
+
+    ball.vx = speed * angle * 3;
+    ball.vy = speed * direction;
   }
 
   function initGame() {
     resize();
     const paddleW = W * PADDLE_W_RATIO;
-    paddleTop = { x: W / 2 - paddleW / 2, w: paddleW, h: PADDLE_H, y: COURT_MARGIN + PADDLE_MARGIN, speed: W * 0.012 };
-    paddleBottom = { x: W / 2 - paddleW / 2, w: paddleW, h: PADDLE_H, y: H - COURT_MARGIN - PADDLE_MARGIN - PADDLE_H, speed: W * 0.012 };
-    nextServer = null;
-    resetBall();
+    paddleTop = { x: W / 2 - paddleW / 2, w: paddleW, h: PADDLE_H, y: COURT_MARGIN + PADDLE_MARGIN, speed: W * 0.014 };
+    paddleBottom = { x: W / 2 - paddleW / 2, w: paddleW, h: PADDLE_H, y: H - COURT_MARGIN - PADDLE_MARGIN - PADDLE_H, speed: W * 0.014 };
+    scores = { cyan: 0, magenta: 0 };
+    updateScoreDisplay();
+    ball = { x: W / 2, y: H / 2, vx: 0, vy: 0, radius: BALL_RADIUS };
+    startServe(Math.random() < 0.5 ? 'cyan' : 'magenta');
   }
 
   // Controls: player controls one paddle via pointer / arrow keys, the other side is AI
   let pointerX = null;
 
   canvas.addEventListener('mousemove', (e) => {
-    pointerX = e.clientX;
+    const rect = canvas.getBoundingClientRect();
+    pointerX = e.clientX - rect.left;
   });
   canvas.addEventListener('touchmove', (e) => {
-    pointerX = e.touches[0].clientX;
+    const rect = canvas.getBoundingClientRect();
+    pointerX = e.touches[0].clientX - rect.left;
     e.preventDefault();
   }, { passive: false });
 
-  window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+  function tryFire() {
+    if (gameState === 'serving' && servingSide === playerColor) fireServe();
+  }
+  canvas.addEventListener('click', tryFire);
+  canvas.addEventListener('touchstart', tryFire, { passive: true });
+  window.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+    if (e.key === ' ') tryFire();
+  });
   window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
@@ -210,6 +392,23 @@
     osc.stop(now + 0.07);
   }
 
+  function playScoreSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [0, 0.09].forEach((delay, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440 + i * 220, now + delay);
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.0001, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.3, now + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.15);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.16);
+    });
+  }
+
   function update() {
     const playerPaddle = playerColor === 'cyan' ? paddleTop : paddleBottom;
     const aiPaddle = playerColor === 'cyan' ? paddleBottom : paddleTop;
@@ -224,13 +423,21 @@
     if (keys['ArrowLeft']) playerPaddle.x = clamp(playerPaddle.x - playerPaddle.speed, minX, maxX - playerPaddle.w);
     if (keys['ArrowRight']) playerPaddle.x = clamp(playerPaddle.x + playerPaddle.speed, minX, maxX - playerPaddle.w);
 
-    // simple AI tracking with slight lag
-    const targetX = ball.x - aiPaddle.w / 2;
+    // AI tracking with slight lag (only relevant target when playing or when AI must position before serving)
+    const aiTarget = gameState === 'playing' ? ball.x : (aiPaddle.x + aiPaddle.w / 2);
+    const targetX = aiTarget - aiPaddle.w / 2;
     const aiSpeed = aiPaddle.speed * 0.85;
     if (Math.abs(aiPaddle.x - targetX) > aiSpeed) {
       aiPaddle.x += aiPaddle.x < targetX ? aiSpeed : -aiSpeed;
     }
     aiPaddle.x = clamp(aiPaddle.x, minX, maxX - aiPaddle.w);
+
+    if (gameState === 'serving') {
+      attachBallToServer();
+      positionServeHint();
+      speedFillEl.style.height = '0%';
+      return;
+    }
 
     // ball movement
     ball.x += ball.vx;
@@ -239,6 +446,10 @@
     // record trail position
     trail.push({ x: ball.x, y: ball.y });
     if (trail.length > TRAIL_LENGTH) trail.shift();
+
+    // speed meter
+    const currentSpeed = Math.hypot(ball.vx, ball.vy);
+    speedFillEl.style.height = clamp((currentSpeed / MAX_SPEED) * 100, 0, 100) + '%';
 
     // wall bounce (left/right) - bounded by court margin
     if (ball.x - ball.radius <= COURT_MARGIN) {
@@ -277,13 +488,17 @@
       playHit(clamp(speed / 20, 0, 1));
     }
 
-    // point lost: ball passes top -> cyan lost, serves next. ball passes bottom -> magenta lost, serves next.
+    // point lost: ball passes top -> cyan lost, magenta scores. ball passes bottom -> magenta lost, cyan scores.
     if (ball.y < -50) {
-      nextServer = 'cyan';
-      resetBall();
+      scores.magenta += 1;
+      updateScoreDisplay();
+      playScoreSound();
+      startServe('cyan');
     } else if (ball.y > H + 50) {
-      nextServer = 'magenta';
-      resetBall();
+      scores.cyan += 1;
+      updateScoreDisplay();
+      playScoreSound();
+      startServe('magenta');
     }
   }
 
@@ -319,7 +534,7 @@
     ctx.lineTo(W - COURT_MARGIN, H / 2);
     ctx.stroke();
 
-    // paddles - elongated rounded shape (squirtle-like capsule)
+    // paddles - elongated rounded shape
     const topRadius = paddleTop.h / 2;
     ctx.fillStyle = COLOR_CYAN;
     roundedRect(paddleTop.x, paddleTop.y, paddleTop.w, paddleTop.h, topRadius);
@@ -333,7 +548,7 @@
     // ball trail (speed effect)
     for (let i = 0; i < trail.length; i++) {
       const t = trail[i];
-      const progress = i / trail.length; // 0 = oldest, 1 = newest
+      const progress = i / trail.length;
       const alpha = progress * 0.35;
       const r = ball.radius * (0.4 + progress * 0.6);
       ctx.beginPath();
@@ -370,4 +585,5 @@
 </script>
 
 </body>
+</html>
 </html>
