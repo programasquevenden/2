@@ -1,4 +1,25 @@
 <!DOCTYPE html>
+<!--
+NOTAS DEL ARCHIVO (todas las notas van aquí arriba)
+
+1. QUÉ ES: página de venta para inmobiliarias. Precio único: $100. Contacto por WhatsApp (51903307861).
+
+2. SECCIONES COMERCIALES (#trabajos): son 3 funciones dentro de UNA MISMA página web inmobiliaria,
+   no 3 páginas ni 3 rubros distintos. Trabajan juntas y se cobran juntas por $100:
+   - #propietarios  -> Captar propietarios que quieren vender o alquilar sus inmuebles.
+   - #compradores   -> Conseguir compradores.
+   - #inquilinos    -> Conseguir inquilinos.
+   Cada tarjeta (.case) = una sección. No llevan precio propio.
+   Antes había un título sobre las tarjetas ("Una página, tres secciones" + "Las tres trabajan juntas
+   dentro de la misma página web de tu inmobiliaria, por un único pago de $100."). Se quitó de la
+   vista y su función queda explicada en este punto.
+
+3. IMÁGENES (subir junto a este archivo):
+   - portada.webp (también funciona .jpg o .png): fondo de la portada, lo demás se sobrepone.
+   - propietarios.webp, compradores.webp, inquilinos.webp: una por sección.
+
+4. FORMULARIO (#f): el selector "Qué quieres conseguir" y el mensaje se envían a WhatsApp.
+-->
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -160,7 +181,6 @@ footer svg{width:22px;height:22px;flex-shrink:0;display:block}
 </nav>
 
 <header class="hero" id="top">
-  <!-- PORTADA: sube tu imagen junto a este archivo con el nombre portada.webp (también funciona portada.jpg o portada.png). Queda de fondo y todo lo demás se sobrepone. -->
   <div class="hero-bg" aria-hidden="true">
     <div class="ph green"><span>IMAGEN: insertar portada (portada.webp)</span></div>
     <img src="portada.webp" alt="" onload="var p=this.previousElementSibling;if(p)p.remove()" onerror="var e=this.dataset.n|0,x=['jpg','png'];if(e<2){this.dataset.n=e+1;this.src='portada.'+x[e]}else this.remove()">
@@ -177,7 +197,7 @@ footer svg{width:22px;height:22px;flex-shrink:0;display:block}
       document.getElementById('g1').textContent=a[0];document.getElementById('g2').textContent=a[1];
       document.getElementById('hi').setAttribute('aria-label',a[0]+' '+a[1]+' Yo soy Hidalgo')})();
       </script>
-      <p>Diseño páginas web profesionales para inmobiliarias que quieren vender y alquilar más, mostrar sus propiedades con orden y dar confianza a los compradores desde el primer segundo, por un único pago de 100 dólares.</p>
+      <p>Diseño páginas web profesionales para inmobiliarias que quieren captar propietarios, conseguir compradores y encontrar inquilinos desde una sola página, con una imagen que da confianza desde el primer segundo, por un único pago de 100 dólares.</p>
       <div class="cta">  
         <a class="btn main magnet" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20para%20mi%20inmobiliaria" target="_blank" rel="noopener">Pedir mi web por WhatsApp</a>
       </div>
@@ -186,45 +206,39 @@ footer svg{width:22px;height:22px;flex-shrink:0;display:block}
 </header>
 
 <div class="marq" aria-hidden="true"><div class="track">
-  <div><span>Diseño a medida</span><i></i><span>Catálogo de propiedades</span><i></i><span>Casas</span><i></i><span>Departamentos</span><i></i><span>Terrenos</span><i></i><span>Locales comerciales</span><i></i></div>
-  <div><span>Diseño a medida</span><i></i><span>Catálogo de propiedades</span><i></i><span>Casas</span><i></i><span>Departamentos</span><i></i><span>Terrenos</span><i></i><span>Locales comerciales</span><i></i></div>
+  <div><span>Diseño a medida</span><i></i><span>Captar propietarios</span><i></i><span>Conseguir compradores</span><i></i><span>Conseguir inquilinos</span><i></i></div>
+  <div><span>Diseño a medida</span><i></i><span>Captar propietarios</span><i></i><span>Conseguir compradores</span><i></i><span>Conseguir inquilinos</span><i></i></div>
 </div></div>
 
 <section class="work" id="trabajos">
   <div class="wrap">
-    <article class="case">
-      <div class="shot"><img src="casas.webp" alt="Casa moderna con jardín" loading="lazy"></div>
+    <article class="case" id="propietarios">
+      <div class="shot"><img src="propietarios.webp" alt="Propietario entregando las llaves de su casa a un asesor inmobiliario" loading="lazy"></div>
       <div class="info">
-        <div class="trow"><h3>Casas</h3><span class="price">$ 100</span></div>
-        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Qué propiedades tienes disponibles</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l9.5 9.5a1.4 1.4 0 0 1 0 2L15.5 20.5a1.4 1.4 0 0 1-2 0z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>Cuáles son los precios</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cuáles son tus horarios de atención</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Dónde están ubicadas</li></ul>
-        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20para%20mi%20inmobiliaria%20de%20casas" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero una página para mi inmobiliaria</a></div>
+        <h3>Captar propietarios</h3>
+        <p>Para quienes quieren vender o alquilar su inmueble y buscan quién lo gestione.</p>
+        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>Formulario para que publiquen su inmueble contigo</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l9.5 9.5a1.4 1.4 0 0 1 0 2L15.5 20.5a1.4 1.4 0 0 1-2 0z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>Pedido de tasación gratuita</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Por qué vender o alquilar con tu inmobiliaria</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Contacto directo por WhatsApp</li></ul>
+        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20inmobiliaria%20para%20captar%20propietarios" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero esta sección en mi página</a></div>
       </div>
     </article>
 
-    <article class="case">
-      <div class="shot"><img src="departamentos.webp" alt="Sala de un departamento amoblado" loading="lazy"></div>
+    <article class="case" id="compradores">
+      <div class="shot"><img src="compradores.webp" alt="Pareja visitando una casa en venta con un asesor" loading="lazy"></div>
       <div class="info">
-        <div class="trow"><h3>Departamentos</h3><span class="price">$ 100</span></div>
-        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Qué propiedades tienes disponibles</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l9.5 9.5a1.4 1.4 0 0 1 0 2L15.5 20.5a1.4 1.4 0 0 1-2 0z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>Cuáles son los precios</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cuáles son tus horarios de atención</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Dónde están ubicadas</li></ul>
-        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20para%20mi%20inmobiliaria%20de%20departamentos" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero una página para mi inmobiliaria</a></div>
+        <h3>Conseguir compradores</h3>
+        <p>Para quienes buscan comprar y necesitan ver opciones claras antes de llamar.</p>
+        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Propiedades en venta con fotos y ubicación</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l9.5 9.5a1.4 1.4 0 0 1 0 2L15.5 20.5a1.4 1.4 0 0 1-2 0z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>Precio, metros, dormitorios y baños a la vista</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zonas donde tienes inmuebles disponibles</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Botón para coordinar una visita por WhatsApp</li></ul>
+        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20inmobiliaria%20para%20conseguir%20compradores" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero esta sección en mi página</a></div>
       </div>
     </article>
 
-    <article class="case">
-      <div class="shot"><img src="terrenos.webp" alt="Terreno amplio listo para construir" loading="lazy"></div>
+    <article class="case" id="inquilinos">
+      <div class="shot"><img src="inquilinos.webp" alt="Persona recibiendo las llaves de un departamento en alquiler" loading="lazy"></div>
       <div class="info">
-        <div class="trow"><h3>Terrenos</h3><span class="price">$ 100</span></div>
-        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Qué propiedades tienes disponibles</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l9.5 9.5a1.4 1.4 0 0 1 0 2L15.5 20.5a1.4 1.4 0 0 1-2 0z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>Cuáles son los precios</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cuáles son tus horarios de atención</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Dónde están ubicadas</li></ul>
-        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20para%20mi%20inmobiliaria%20de%20terrenos" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero una página para mi inmobiliaria</a></div>
-      </div>
-    </article>
-
-    <article class="case">
-      <div class="shot"><img src="locales.webp" alt="Local comercial con vitrina a la calle" loading="lazy"></div>
-      <div class="info">
-        <div class="trow"><h3>Locales comerciales</h3><span class="price">$ 100</span></div>
-        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>Qué propiedades tienes disponibles</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l9.5 9.5a1.4 1.4 0 0 1 0 2L15.5 20.5a1.4 1.4 0 0 1-2 0z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>Cuáles son los precios</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cuáles son tus horarios de atención</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Dónde están ubicadas</li></ul>
-        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20para%20mi%20inmobiliaria%20de%20locales%20comerciales" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero una página para mi inmobiliaria</a></div>
+        <h3>Conseguir inquilinos</h3>
+        <p>Para quienes buscan alquilar y quieren saber precio y requisitos desde el inicio.</p>
+        <ul><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg>Propiedades en alquiler con renta mensual</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>Requisitos y condiciones del contrato</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Ubicación y servicios cercanos</li><li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8fe3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Formulario de interesados enviado por WhatsApp</li></ul>
+        <div class="acts"><a class="btn ghost" href="https://wa.me/51903307861?text=Hola%2C%20quiero%20una%20web%20inmobiliaria%20para%20conseguir%20inquilinos" target="_blank" rel="noopener"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>Quiero esta sección en mi página</a></div>
       </div>
     </article>
   </div>
@@ -247,14 +261,14 @@ footer svg{width:22px;height:22px;flex-shrink:0;display:block}
       <div>
         <h2>Hablemos de tu inmobiliaria.</h2>
         <p class="sub">Mi trabajo es transformar tus ideas en una página web profesional de alta calidad para que tu negocio destaque.</p>
-        <p class="sub" style="margin-top:14px">Cuéntame qué propiedades ofreces y qué quieres lograr. Te responderé por WhatsApp.</p>
+        <p class="sub" style="margin-top:14px">Cuéntame qué zona trabajas y qué quieres lograr. Te responderé por WhatsApp.</p>
         <a class="num" href="https://wa.me/51903307861" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="#8fe3b8"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 1-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.9 2.100c.1.200.1.400 0 .600l-.4.600c-.2.200-.3.400-.1.700.2.300.8 1.300 1.800 2.100 1.200 1 2.200 1.300 2.500 1.500.3.100.5.100.7-.1l.9-1.100c.2-.3.400-.2.700-.1l2 1c.3.100.5.200.6.300.1.200.1.800-.1 1.500z"/></svg>
           903 307 861
         </a>
       </div>
       <form id="f">
-        <label>Propiedades que ofreces<select name="t"><option>Casas</option><option>Departamentos</option><option>Terrenos</option><option>Locales comerciales</option><option>Varios tipos</option></select></label>
+        <label>Qué quieres conseguir<select name="t"><option>Captar propietarios</option><option>Conseguir compradores</option><option>Conseguir inquilinos</option><option>Las tres secciones</option></select></label>
         <label>Tu nombre<input name="n" required autocomplete="name" placeholder="Nombre y apellido"></label>
         <label>Mensaje<textarea name="m" placeholder="Escribe lo que necesitas"></textarea></label>
         <button class="btn main magnet" type="submit" style="justify-content:center;cursor:pointer">Enviar por WhatsApp</button>
@@ -297,7 +311,7 @@ if(window.ResizeObserver)new ResizeObserver(m).observe(im.parentElement);m()})()
 // form -> WhatsApp
 document.getElementById('f').addEventListener('submit',e=>{
   e.preventDefault();const d=new FormData(e.target);
-  const t=`Hola, soy ${d.get('n')}. Tengo una inmobiliaria (${d.get('t')}) y quiero una web. ${d.get('m')||''}`;
+  const t=`Hola, soy ${d.get('n')}. Tengo una inmobiliaria y quiero una web. Me interesa: ${d.get('t')}. ${d.get('m')||''}`;
   open('https://wa.me/51903307861?text='+encodeURIComponent(t),'_blank');
 });
 // titulo de proceso: lo mas grande posible en 2 lineas
